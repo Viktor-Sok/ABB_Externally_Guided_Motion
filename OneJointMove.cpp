@@ -39,12 +39,6 @@ void CreateSensorMessage(EgmSensor* pSensorMessage){ // receives a pointer to th
 		degrees = 45;
 	}
 
-	/*
-	for (int i =1; i<6; i++){
-		pJoints->set_joints(i,0); // repeated field is like dynamically sized array <set_joints(index, value)>
-	}
-	*/
-	
 	//Setting reference degrees for the <planned> field of EGMSensor data structure;
 	EgmPlanned *pPlanned = new EgmPlanned();
 	pPlanned->set_allocated_joints(pJoints);
@@ -69,19 +63,11 @@ void DisplayRobotMessage(EgmRobot *pRobotMessage){ // receives a pointer to the 
 void WriteRobotLogFile (EgmRobot *pRobotMessage, ofstream &robotLog){
 	if (pRobotMessage->has_header() && pRobotMessage->header().has_seqno() && pRobotMessage->header().has_tm() && pRobotMessage->header().has_mtype())
 	    {
-		    robotLog << pRobotMessage->header().seqno()<<"\t"<< pRobotMessage->header().tm()<<"\tfeedt"/*<<pRobotMessage ->feedback().joints().joints(0)<<"\t"*/
-		    		<< pRobotMessage ->feedback().time().usec()<<"\tconv"<<pRobotMessage->mciconvergencemet()<<"\tplant"/*<< pRobotMessage ->planned().joints().joints(0)<<"\t"*/
+		    robotLog << pRobotMessage->header().seqno()<<"\t"<< pRobotMessage->header().tm()<<"\tfeedt"
+		    		<< pRobotMessage ->feedback().time().usec()<<"\tconv"<<pRobotMessage->mciconvergencemet()<<"\tplant"
 					<<pRobotMessage ->planned().time().usec()<<"\tutil"<<pRobotMessage->utilizationrate()<<"tmots"<<pRobotMessage->motorstate().state()<<"\tmcs"
 					<<pRobotMessage->mcistate().state()<<"\texecs"<<pRobotMessage->rapidexecstate().state()<<endl;
-
-		    //<<pRobotMessage ->feedback().joints()
-		    //<<pRobotMessage ->planned().joints()
-		    //<<pRobotMessage ->feedback().time()
-		    //<<pRobotMessage ->planned().time()
-		    //<<pRobotMessage->motorstate().state()
-		    //<<pRobotMessage->mcistate().state()
-		    //<<pRobotMessage->rapidexecstate().state()
-	    }
+		}
 	    else
 	    {
 	    	robotLog << "No header" << endl;
@@ -94,11 +80,7 @@ void WriteSensorLogFile(EgmSensor *pSensorMessage, ofstream &sensorLog){
 	if (pSensorMessage->has_header() && pSensorMessage->header().has_seqno() && pSensorMessage->header().has_tm() && pSensorMessage->header().has_mtype())
 	    {
 		   sensorLog << pSensorMessage->header().seqno() <<"\t"<< pSensorMessage->header().tm()<<"\tplant"/*<< pSensorMessage ->planned().joints().joints(0)<<"\t"*/
-					<<pSensorMessage ->planned().time().usec()/*<<"\t"<<pSensorMessage->speedref().joints().joints(0)*/<<endl;
-		   //<<pSensorMessage->planned().joints()
-		   //<<pSensorMessage ->planned().time()
-		   //<<pSensorMessage->speedref().joints()
-
+					<<pSensorMessage ->planned().time().usec()<<endl;
 	    }
 	    else
 	    {
@@ -107,46 +89,20 @@ void WriteSensorLogFile(EgmSensor *pSensorMessage, ofstream &sensorLog){
 	    }
 
 }
-/*
-char* toChar(string filename){
-	//filename.append(ext);
-	int n = filename.length();
-	char* filename_char = new char[n+1]; // do not forget to free up the memory later in the program
-	strcpy(filename, filename.c_str());
-	return filename;
-}
-*/
+
 
 int main(int argc, char *argv[]) {
-	/* Specifying the names for the Robot and the Sensor log files */
-	/*
-	char robotLogName[50], sensorLogName[50];
-	cout << "Specify a name for the Robot log file: " << endl;
-	cin >> robotLogName;
-	cout << "Specify a name for the Sensor log file: " << endl;
-	cin >> sensorLogName;
-	*/
+
 	string robotLogName, sensorLogName;
 	cout << "Specify a name for the Robot log file: " << endl;
 	getline(cin, robotLogName);
 	cout << "Specify a name for the Sensor log file: " << endl;
 	getline(cin, sensorLogName);
-	//char* robotLogNametxt, sensorLogNametxt; // ostsream accepts only char type
-	//sensorLogNametxt = addFileExtension(sensorLogName);
-	//robotLogNametxt = addFileExtension(robotLogName); // add extension to a file
+
 	sensorLogName += ".txt";
 	robotLogName += ".txt";
-	//add extension to a file
-	/* Delete the log files if they happen to have the same names as it was specified above*/
-	/*
-	if( remove( "myfile.txt" ) != 0 )
-     cerr << "Error deleting file\n" ;
-  else
-    cout( "File successfully deleted" );
-   return 0;
-   */
-
-	remove(sensorLogName.c_str()); // c_str() converts string to *char
+	
+    remove(sensorLogName.c_str()); // c_str() converts string to *char
 	remove(robotLogName.c_str());
 
 	/*-------------------------------Socket--------------------------------*/
@@ -186,20 +142,6 @@ int main(int argc, char *argv[]) {
 			return 0;
 		}else{
 			cout << "Socket bind is successful!" << endl;
-			//cout << "SevIp: Port:"<< endl; // print out IP and Port in the cmd
-			/*
-			char serverIP[12], serverPORT[5];
-		    ZeroMemory(serverIP, 12);
-		    ZeroMemory(serverPORT, 5);
-		    inet_ntop(AF_INET, &serverAddr.sin_addr, serverIP, 12); // converting to standrard text format
-			inet_ntop(AF_INET, &serverAddr.sin_port, serverPORT, 5);
-			printf("Server's Ip: %s, Server's Port: %s\n  ", serverIP, serverPORT);
-
-			char clientIP[12], clientPORT[5];
-			inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, 12);
-			inet_ntop(AF_INET, &clientAddr.sin_port, clientPORT, 5);
-			printf("Client's Ip: %s, Client's Port: %s\n", clientIP, clientPORT);
-			*/
 			cout <<"Ready to receive messages from the Robot." << endl;
 		}
 	/*------------------------------Socket----------------------------*/
@@ -231,9 +173,7 @@ int main(int argc, char *argv[]) {
 		pRobotMessage->ParseFromArray(protoMessage, bytesReceived); // deserialization
         DisplayRobotMessage(pRobotMessage); // print out the robot message in the console 
         WriteRobotLogFile(pRobotMessage, robotLog); // writes data send by the robot to the file
-        //EgmRapidCtrlExecState RapidState;
-        //RapidState = pRobotMessage->rapidExecState();
-		delete pRobotMessage; // free up resources
+        delete pRobotMessage; // free up resources
 		
 		// create and serialize a sensor message (our reference coordinates which we want the robot to move to)
 		EgmSensor *pSensorMessage = new EgmSensor(); 
@@ -256,10 +196,9 @@ int main(int argc, char *argv[]) {
         delete pSensorMessage; // free up resources
 		
 
-    }
-    //while (RapidState == RAPID_RUNNING);
-
-   return 0 ;
+    
+	}
+return 0 ;
 
 }
 
