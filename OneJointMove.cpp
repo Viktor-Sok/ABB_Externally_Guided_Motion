@@ -7,8 +7,6 @@
 #include <cstring> // gives the additional functionality to work with strings and chars
 static int portNumber = 6510;
 static unsigned int sequenceNumber = 0; //message number, use it to check for lost messages
-//char robotLogName[13] = "RobotLog.txt";
-//char sensorLogName[14] = "SensorLog.txt";
 double degrees = 0;
 
 using namespace std;
